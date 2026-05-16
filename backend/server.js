@@ -200,6 +200,46 @@ app.get("/venues/:id", async (req, res) => {
     res.status(500).json({ error: "Server error" });
   }
 });
+app.post("/login", async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    if (!email) {
+      return res.status(400).json({ error: "Email is required" });
+    }
+
+    let { data: user, error } = await supabase
+      .from("users")
+      .select("*")
+      .eq("email", email)
+      .single();
+
+    if (error && error.code !== "PGRST116") {
+      return res.status(400).json({ error: error.message });
+    }
+
+    if (!user) {
+      const { data: newUser, error: insertError } = await supabase
+        .from("users")
+        .insert([{ email }])
+        .select()
+        .single();
+
+      if (insertError) {
+        return res.status(400).json({ error: insertError.message });
+      }
+
+      user = newUser;
+    }
+
+    res.json({
+      message: "Logged in",
+      user,
+    });
+  } catch (err) {
+    res.status(500).json({ error: "Server error" });
+  }
+});
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
