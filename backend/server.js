@@ -14,6 +14,8 @@ app.use('/reviews', reviewRoutes);
 app.use('/venues', reviewRoutes);
 app.use('/venues', matchRoutes);
 
-app.listen(process.env.PORT || 3000, () => {
-  console.log('Server running on port 3000');
+const PORT = process.env.PORT || 3000;
+
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
 });
