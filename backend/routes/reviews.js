@@ -33,17 +33,20 @@ The frontend will send review data like:
 */
 router.post('/', async (req, res) => {
   const {
-    google_place_id,
-    user_id,
-    mobility_score,
-    noise_score,
-    lighting_score,
-    seating_score,
-    door_width_ok,
-    has_step,
-    visited_at
-  } = req.body;
-
+        google_place_id,
+        name,
+        address,
+        lat,
+        lng,
+        user_id,
+        mobility_score,
+        noise_score,
+        lighting_score,
+        seating_score,
+        door_width_ok,
+        has_step,
+        visited_at
+    } = req.body;
   try {
     /*
     First, check if this venue already exists in our venues table.
@@ -64,7 +67,13 @@ router.post('/', async (req, res) => {
     if (!venue_id) {
       const { data: newVenue, error: venueError } = await supabase
         .from('venues')
-        .insert({ google_place_id })
+        .insert({
+                    google_place_id,
+                    name: name || 'Unknown Venue',
+                    address: address || null,
+                    lat: lat || null,
+                    lng: lng || null,
+                })
         .select('id')
         .single();
 
