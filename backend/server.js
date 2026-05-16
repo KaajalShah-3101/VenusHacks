@@ -1,6 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 const dotenv = require("dotenv");
+const axios = require("axios");
 const { createClient } = require("@supabase/supabase-js");
 
 dotenv.config();
@@ -47,7 +48,110 @@ app.post("/signup", async (req, res) => {
 });
 
 const PORT = process.env.PORT || 5001;
+app.post("/profile", async (req, res) => {
+  try {
+    const {
+      user_id,
+      mobility_weight,
+      noise_weight,
+      lighting_weight,
+      seating_weight,
+    } = req.body;
 
+    if (!user_id) {
+      return res.status(400).json({ error: "user_id is required" });
+    }
+
+    const { data, error } = await supabase
+      .from("user_profiles")
+      .upsert(
+        {
+          user_id,
+          mobility_weight,
+          noise_weight,
+          lighting_weight,
+          seating_weight,
+          updated_at: new Date().toISOString(),
+        },
+        { onConflict: "user_id" }
+      )
+      .select()
+      .single();
+
+    if (error) {
+      return res.status(400).json({ error: error.message });
+    }
+
+    res.status(200).json({
+      message: "Profile saved",
+      profile: data,
+    });
+  } catch (err) {
+    res.status(500).json({ error: "Server error" });
+  }
+});
+app.get("/venues", async (req, res) => {
+  try {
+    const { q, lat, lng } = req.query;
+
+    if (!lat || !lng) {
+      return res.status(400).json({ error: "lat and lng are required" });
+    }
+
+    const searchText = q || "restaurant cafe";
+
+    const googleResponse = await axios.post(
+      "https://places.googleapis.com/v1/places:searchText",
+      {
+        textQuery: searchText,
+        locationBias: {
+          circle: {
+            center: {
+              latitude: Number(lat),
+              longitude: Number(lng),
+            },
+            radius: 5000,
+          },
+        },
+        includedType: "restaurant",
+        maxResultCount: 10,
+      },
+      {
+        headers: {
+          "Content-Type": "application/json",
+          "X-Goog-Api-Key": process.env.GOOGLE_PLACES_API_KEY,
+          "X-Goog-FieldMask":
+            "places.id,places.displayName,places.formattedAddress,places.location,places.photos",
+        },
+      }
+    );
+
+    const places = googleResponse.data.places || [];
+
+    const venues = places.map((place) => ({
+      google_place_id: place.id,
+      name: place.displayName?.text || "Unknown venue",
+      address: place.formattedAddress || null,
+      lat: place.location?.latitude || null,
+      lng: place.location?.longitude || null,
+      photo_url: place.photos?.[0]?.name || null,
+    }));
+
+    for (const venue of venues) {
+      await supabase
+        .from("venues")
+        .upsert(venue, { onConflict: "google_place_id" });
+    }
+
+    res.json({
+      count: venues.length,
+      venues,
+    });
+  } catch (err) {
+    console.error("Google Places error:", err.response?.data || err.message);
+    res.status(500).json({ error: "Failed to fetch venues" });
+  }
+});
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
