@@ -152,6 +152,54 @@ app.get("/venues", async (req, res) => {
     res.status(500).json({ error: "Failed to fetch venues" });
   }
 });
+app.get("/venues/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const { data: venue, error: venueError } = await supabase
+      .from("venues")
+      .select("*")
+      .eq("id", id)
+      .single();
+
+    if (venueError || !venue) {
+      return res.status(404).json({ error: "Venue not found" });
+    }
+
+    const { data: reviews, error: reviewsError } = await supabase
+      .from("accessibility_reviews")
+      .select("*")
+      .eq("venue_id", id)
+      .order("created_at", { ascending: false });
+
+    if (reviewsError) {
+      return res.status(400).json({ error: reviewsError.message });
+    }
+
+    const avg = (field) => {
+      const values = reviews
+        .map((review) => review[field])
+        .filter((value) => value !== null && value !== undefined);
+
+      if (values.length === 0) return null;
+
+      return values.reduce((sum, value) => sum + value, 0) / values.length;
+    };
+
+    res.json({
+      venue,
+      reviews,
+      averages: {
+        mobility_score: avg("mobility_score"),
+        noise_score: avg("noise_score"),
+        lighting_score: avg("lighting_score"),
+        seating_score: avg("seating_score"),
+      },
+    });
+  } catch (err) {
+    res.status(500).json({ error: "Server error" });
+  }
+});
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
