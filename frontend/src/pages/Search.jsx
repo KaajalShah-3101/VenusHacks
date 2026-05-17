@@ -2,6 +2,9 @@ import { useCallback, useEffect, useState } from 'react';
 import { api, DEMO_VENUES } from '../api/client';
 import { useAuth } from '../context/AuthContext';
 import VenueCard from '../components/VenueCard';
+import Nor from '../components/mascot/Nor';
+import Sticker from '../components/mascot/Sticker';
+import SquiggleUnderline from '../components/mascot/SquiggleUnderline';
 
 const DEFAULT_LAT = 33.6846;
 const DEFAULT_LNG = -117.8265;
@@ -77,57 +80,72 @@ export default function Search() {
   const displayList = showDemo ? DEMO_VENUES : venues;
 
   return (
-    <div className="space-y-8">
-      <div>
-        <h1 className="font-display text-3xl text-coral m-0">Find a venue</h1>
-        <p className="text-[#6b6560] mt-2 leading-relaxed">
-          Search nearby places and see how well each one matches your profile.
-        </p>
-      </div>
+    <section>
+      <header
+        style={{
+          display: 'flex',
+          alignItems: 'flex-end',
+          gap: 12,
+          marginBottom: 8,
+          flexWrap: 'wrap',
+        }}
+      >
+        <div style={{ flex: 1, minWidth: 200 }}>
+          <p className="hand" style={{ fontSize: 18, color: 'var(--sage-deep)', margin: 0 }}>
+            where to today?
+          </p>
+          <h1 className="script-title" style={{ fontSize: 52, margin: '4px 0 0' }}>
+            Find a venue
+          </h1>
+          <SquiggleUnderline width={260} />
+        </div>
+        <Sticker kind="map" size={56} rotate={-12} style={{ marginBottom: 8 }} />
+        <Nor size={56} expression="happy" />
+      </header>
 
-      <form onSubmit={handleSearch} className="space-y-3">
+      <p style={{ color: 'var(--ink-soft)', fontSize: 15, margin: '12px 0 20px' }}>
+        Search nearby and see how well each one matches{' '}
+        <em className="hand" style={{ fontSize: 18, color: 'var(--coral-deep)' }}>
+          your
+        </em>{' '}
+        profile.
+      </p>
+
+      <form onSubmit={handleSearch} className="sticker-card" style={{ padding: 16, marginBottom: 20 }}>
+        <span className="tape sage" style={{ top: -10, right: 24, position: 'absolute' }} />
         <input
           type="search"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder="Cafe, restaurant, study spot…"
-          className="w-full px-4 py-3 rounded-xl border-2 border-salmon/30 bg-white/70 focus:border-coral focus:outline-none"
+          placeholder="🔍  Cafe, restaurant, study spot…"
+          className="am-input"
+          style={{ marginBottom: 12, background: 'var(--cream)' }}
         />
-        <div className="flex gap-2">
-          <button
-            type="button"
-            onClick={useMyLocation}
-            className="px-4 py-2 rounded-xl border-2 border-sage/50 text-sage font-medium bg-transparent cursor-pointer hover:bg-sage/10 text-sm"
-          >
-            Use my location
+        <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+          <button type="button" onClick={useMyLocation} className="am-btn ghost">
+            📍 Use my location
           </button>
-          <button
-            type="submit"
-            disabled={loading}
-            className="flex-1 py-2 rounded-xl bg-coral text-white font-semibold border-0 cursor-pointer hover:bg-coral/90 disabled:opacity-60"
-          >
-            {loading ? 'Searching…' : 'Search'}
+          <button type="submit" disabled={loading} className="am-btn" style={{ flex: 1, minWidth: 140 }}>
+            {loading ? 'Searching…' : 'Search nearby →'}
           </button>
         </div>
         {error && (
-          <p className="text-sm text-coral" role="alert">
+          <p className="am-alert" role="alert" style={{ marginTop: 12 }}>
             {error}
           </p>
         )}
       </form>
 
       {showDemo && (
-        <section className="space-y-3">
-          <h2 className="text-sm font-semibold text-[#6b6560] uppercase tracking-wide m-0">
-            Demo venues (seeded data)
-          </h2>
-          <p className="text-sm text-[#8a8480] m-0 -mt-1">
-            Use these for your pitch — they have accessibility reviews loaded.
-          </p>
-        </section>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 14 }}>
+          <span className="hand" style={{ fontSize: 16, color: 'var(--ink-soft)' }}>
+            ✿ Nearby spots — pre-loaded for the demo
+          </span>
+          <div style={{ flex: 1, borderTop: '2px dashed var(--coral-soft)' }} />
+        </div>
       )}
 
-      <ul className="space-y-3 list-none p-0 m-0">
+      <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 12 }}>
         {displayList.map((venue) => (
           <li key={venue.google_place_id}>
             <VenueCard venue={venue} matchScore={scores[venue.google_place_id]} />
@@ -136,8 +154,10 @@ export default function Search() {
       </ul>
 
       {!showDemo && venues.length === 0 && !loading && (
-        <p className="text-center text-[#8a8480]">No venues found. Try a different search.</p>
+        <p className="hand" style={{ textAlign: 'center', color: 'var(--ink-muted)' }}>
+          No venues found. Try a different search.
+        </p>
       )}
-    </div>
+    </section>
   );
 }
