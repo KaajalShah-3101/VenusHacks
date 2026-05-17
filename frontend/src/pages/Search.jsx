@@ -46,15 +46,15 @@ useEffect(() => {
 fetchScores(DEMO_VENUES);
 }, [fetchScores]);
 
-// 🐝 fly when a venue is selected
-useEffect(() => {
-if (selected) {
-setNorPos({
-x: 220,
-y: 140,
-});
-}
-}, [selected]);
+// // 🐝 fly when a venue is selected
+// useEffect(() => {
+// if (selected) {
+// setNorPos({
+// x: 220,
+// y: 140,
+// });
+// }
+// }, [selected]);
 
 async function handleSearch(e) {
 e.preventDefault();
@@ -203,30 +203,14 @@ return (
       <MapView
         venues={displayList}
         center={{ lat, lng }}
-        onSelect={setSelected}
+        onSelect={(v) => {setSelected(v);
+      }}
+      onMapClick={({ x, y }) => {
+        setNorPos({ x, y });
+      }}
       />
     </div>
 
-    {/* VR VIEW */}
-    {selected && (
-      <div
-        style={{
-          marginBottom: 20,
-          borderRadius: 20,
-          overflow: "hidden",
-          border: "2px dashed var(--coral-soft)",
-        }}
-      >
-        <iframe
-          width="100%"
-          height="300"
-          style={{ border: 0 }}
-          loading="lazy"
-          allowFullScreen
-          src={`https://www.google.com/maps?q=&layer=c&cbll=${selected.lat},${selected.lng}`}
-        />
-      </div>
-    )}
 
     {/* DEMO LABEL */}
     {showDemo && (
