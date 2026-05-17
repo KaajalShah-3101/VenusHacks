@@ -7,6 +7,7 @@ import Sticker from '../components/mascot/Sticker';
 import SquiggleUnderline from '../components/mascot/SquiggleUnderline';
 import Header from '../components/Header';
 import { VENUE_STICKERS, fitBadgeClass, fitLevel } from '../lib/venueMeta';
+import { getPhotos, addPhoto } from "../utils/photoStorage"; // 📸 NEW
 
 const MATCH_ROWS = [
 { key: 'mobility_score', sticker: 'hand', title: 'Mobility', note: 'Step-free entry, room to move' },
@@ -45,42 +46,78 @@ const [averages, setAverages] = useState(null);
 const [match, setMatch] = useState(null);
 const [loading, setLoading] = useState(true);
 
+// 📸 NEW STATE
+const [photos, setPhotos] = useState([]);
+
 useEffect(() => {
 let cancelled = false;
+
+
 async function load() {
-setLoading(true);
-try {
-const [reviewData, matchData] = await Promise.all([
-api.getVenueReviews(decodedId),
-api.getMatchScore(decodedId, user.id),
-]);
-if (!cancelled) {
-setReviews(reviewData.reviews || []);
-setAverages(reviewData.averages);
-setMatch(matchData.match_score);
+  setLoading(true);
+  try {
+    const [reviewData, matchData] = await Promise.all([
+      api.getVenueReviews(decodedId),
+      api.getMatchScore(decodedId, user.id),
+    ]);
+
+    if (!cancelled) {
+      setReviews(reviewData.reviews || []);
+      setAverages(reviewData.averages);
+      setMatch(matchData.match_score);
+
+      // 📸 LOAD PHOTOS
+      setPhotos(getPhotos(decodedId));
+    }
+  } catch {
+    if (!cancelled) {
+      setReviews([]);
+      setAverages(null);
+      setMatch(null);
+    }
+  } finally {
+    if (!cancelled) setLoading(false);
+  }
 }
-} catch {
-if (!cancelled) {
-setReviews([]);
-setAverages(null);
-setMatch(null);
-}
-} finally {
-if (!cancelled) setLoading(false);
-}
-}
+
 load();
 return () => {
-cancelled = true;
+  cancelled = true;
 };
+
+
 }, [decodedId, user.id]);
+
+// 📸 UPLOAD HANDLER
+function handleUpload(e) {
+const file = e.target.files[0];
+if (!file) return;
+
+
+const reader = new FileReader();
+
+reader.onload = () => {
+  const newPhoto = {
+    url: reader.result,
+    createdAt: Date.now(),
+  };
+
+  addPhoto(decodedId, newPhoto);
+  setPhotos((prev) => [...prev, newPhoto]);
+};
+
+reader.readAsDataURL(file);
+
+
+}
 
 const badge = fitBadgeClass(match);
 
 return (
-<>
-<Header />
-  <section>
+<> <Header /> <section>
+
+
+    {/* HEADER */}
     <header style={{ display: 'flex', gap: 16, alignItems: 'flex-start', marginBottom: 18 }}>
       <div
         style={{
@@ -98,13 +135,17 @@ return (
       >
         <Sticker kind={stickerMeta.kind} size={52} />
       </div>
+
       <div style={{ flex: 1, minWidth: 0 }}>
         <h1 className="script-title" style={{ fontSize: 44, margin: 0 }}>
           {venueMeta.name}
         </h1>
         <SquiggleUnderline width={200} />
-        <p style={{ color: 'var(--ink-soft)', fontSize: 15, margin: '6px 0 0' }}>{venueMeta.address}</p>
+        <p style={{ color: 'var(--ink-soft)', fontSize: 15, margin: '6px 0 0' }}>
+          {venueMeta.address}
+        </p>
       </div>
+
       {match != null && (
         <div className={`fit-badge ${badge}`} style={{ width: 80, height: 80 }}>
           <span className="score" style={{ fontSize: 26 }}>
@@ -115,6 +156,7 @@ return (
       )}
     </header>
 
+    {/* NOR MESSAGE */}
     <article
       className="sticker-card"
       style={{
@@ -137,6 +179,7 @@ return (
       </div>
     </article>
 
+    {/* MATCH GRID */}
     <p className="hand" style={{ fontSize: 17, color: 'var(--ink-soft)', marginBottom: 10 }}>
       ✿ How this place matches you
     </p>
@@ -157,6 +200,7 @@ return (
         {MATCH_ROWS.map((row) => {
           const score = averages[row.key];
           const level = fitLevel(score);
+
           return (
             <div
               key={row.key}
@@ -170,17 +214,7 @@ return (
                   {score != null ? `${score.toFixed(1)} / 5 avg` : row.note}
                 </div>
               </div>
-              <span
-                className="hand"
-                style={{
-                  fontSize: 13,
-                  padding: '4px 10px',
-                  background: level === 'great' ? 'var(--sage-soft)' : 'var(--butter-soft)',
-                  color: level === 'great' ? 'var(--sage-deep)' : '#9c7b2d',
-                  borderRadius: 999,
-                  border: `1.5px solid ${level === 'great' ? 'var(--sage)' : 'var(--butter)'}`,
-                }}
-              >
+              <span className="hand">
                 {level === 'great' ? 'great fit ✓' : level === 'ok' ? 'okay' : 'limited'}
               </span>
             </div>
@@ -189,6 +223,7 @@ return (
       </div>
     )}
 
+    {/* NOTES */}
     {reviews.length > 0 && (
       <section style={{ marginBottom: 20 }}>
         <h2 className="hand" style={{ fontSize: 18, marginBottom: 10 }}>
@@ -197,14 +232,61 @@ return (
         <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 10 }}>
           {reviews.slice(0, 4).map((r) => (
             <li key={r.id} className="sticker-card" style={{ padding: 12, fontSize: 14 }}>
-              Mobility {r.mobility_score}/5 · Noise {r.noise_score}/5 · Lighting {r.lighting_score}/5 ·
-              Seating {r.seating_score}/5
+              Mobility {r.mobility_score}/5 · Noise {r.noise_score}/5 · Lighting {r.lighting_score}/5 · Seating {r.seating_score}/5
             </li>
           ))}
         </ul>
       </section>
     )}
 
+    {/* 📸 PHOTOS SECTION */}
+    <section style={{ marginBottom: 20 }}>
+      <h2 className="hand" style={{ fontSize: 18, marginBottom: 10 }}>
+        Accessibility photos
+      </h2>
+
+      <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
+        {photos.map((p, i) => (
+          <img
+            key={i}
+            src={p.url}
+            alt="venue"
+            style={{
+              width: 110,
+              height: 110,
+              objectFit: "cover",
+              borderRadius: 16,
+              boxShadow: "0 6px 14px rgba(0,0,0,0.12)",
+            }}
+          />
+        ))}
+
+        <label
+          style={{
+            width: 110,
+            height: 110,
+            borderRadius: 16,
+            border: "2px dashed var(--coral-soft)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            cursor: "pointer",
+            background: "var(--cream)",
+            fontSize: 24,
+          }}
+        >
+          📸
+          <input
+            type="file"
+            accept="image/*"
+            onChange={handleUpload}
+            style={{ display: "none" }}
+          />
+        </label>
+      </div>
+    </section>
+
+    {/* BUTTONS */}
     <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
       <Link
         to={`/venue/${encodeURIComponent(decodedId)}/review`}
@@ -214,6 +296,7 @@ return (
       >
         📝 Leave a note
       </Link>
+
       <a
         href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(venueMeta.address || venueMeta.name)}`}
         target="_blank"
@@ -224,7 +307,9 @@ return (
         Get directions →
       </a>
     </div>
+
   </section>
 </>
+
 );
 }
