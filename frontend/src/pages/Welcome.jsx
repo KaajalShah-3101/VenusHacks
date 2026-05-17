@@ -20,19 +20,36 @@ async function handleSubmit(e) {
 e.preventDefault();
 setError('');
 setLoading(true);
+
+
 try {
-const { user } = await api.login(email.trim());
-setUser(user);
-const hasProfile = localStorage.getItem('accessmap_profile_complete') === 'true';
-navigate(hasProfile ? '/search' : '/onboarding');
+  const { user } = await api.login(email.trim());
+  setUser(user);
+
+  // 🔥 FIX: track user + reset onboarding for new emails
+  const lastUser = localStorage.getItem("last_user_email");
+
+  if (lastUser !== email) {
+    localStorage.setItem("accessmap_profile_complete", "false");
+    localStorage.setItem("last_user_email", email);
+  }
+
+  const hasProfile =
+    localStorage.getItem("accessmap_profile_complete") === "true";
+
+  navigate(hasProfile ? '/search' : '/onboarding');
+
 } catch (err) {
-setError(err.message);
+  setError(err.message);
 } finally {
-setLoading(false);
+  setLoading(false);
 }
+
+
 }
 
 return ( <div className="am-screen has-noise"> <CollageBg color="var(--coral-soft)" /> <ScatteredStickers variant="signin" />
+
 
   {/* ✨ Flying Nor animation */}
   <FlyingNor />
@@ -146,6 +163,7 @@ return ( <div className="am-screen has-noise"> <CollageBg color="var(--coral-sof
     style={{ position: 'absolute', top: 200, right: 24, pointerEvents: 'none' }}
   />
 </div>
+
 
 );
 }
