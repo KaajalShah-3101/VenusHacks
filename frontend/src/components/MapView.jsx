@@ -47,7 +47,9 @@ disableDefaultUI: true,
 };
 
 export default function MapView({ venues, center, onSelect, onMapClick }) {
-const [showStreetView, setShowStreetView] = useState(false);
+  const [showStreetView, setShowStreetView] = useState(false);
+  
+  console.log("MAP KEY:", import.meta.env.VITE_GOOGLE_MAPS_API_KEY);
 
 return ( <LoadScript googleMapsApiKey={import.meta.env.VITE_GOOGLE_MAPS_API_KEY}>
 <GoogleMap

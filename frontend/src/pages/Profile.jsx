@@ -45,6 +45,29 @@ useEffect(() => {
 setSaved(false);
 }, [weights]);
 
+useEffect(() => {
+  async function loadProfile() {
+    if (!user?.id) return;
+
+    try {
+      const data = await api.getProfile(user.id);
+
+      if (data.hasProfile && data.profile) {
+        setWeights({
+          mobility_weight: data.profile.mobility_weight,
+          noise_weight: data.profile.noise_weight,
+          lighting_weight: data.profile.lighting_weight,
+          seating_weight: data.profile.seating_weight,
+        });
+      }
+    } catch (err) {
+      setError(err.message);
+    }
+  }
+
+  loadProfile();
+}, [user]);
+
 async function handleSave(e) {
 e.preventDefault();
 setSaving(true);

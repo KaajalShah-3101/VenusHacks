@@ -251,12 +251,6 @@ return (
       </div>
     </div>
 
-    {/* DEMO LABEL */}
-    {showDemo && (
-      <p className="hand" style={{ marginBottom: 14 }}>
-        ✿ Nearby spots — pre-loaded for the demo
-      </p>
-    )}
 
     {/* LIST */}
     <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>

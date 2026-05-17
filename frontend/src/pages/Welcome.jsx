@@ -13,7 +13,7 @@ export default function Welcome() {
 const [email, setEmail] = useState('');
 const [loading, setLoading] = useState(false);
 const [error, setError] = useState('');
-const { setUser } = useAuth();
+const { setUser, setProfileCompleteStatus } = useAuth();
 const navigate = useNavigate();
 
 async function handleSubmit(e) {
@@ -25,19 +25,19 @@ setLoading(true);
 try {
   const { user } = await api.login(email.trim());
   setUser(user);
+  console.log("LOGIN USER:", user);
 
   // 🔥 FIX: track user + reset onboarding for new emails
-  const lastUser = localStorage.getItem("last_user_email");
+  const profileRes = await fetch(`http://localhost:5001/profile/${user.id}`);
+  const profileData = await profileRes.json();
 
-  if (lastUser !== email) {
-    localStorage.setItem("accessmap_profile_complete", "false");
-    localStorage.setItem("last_user_email", email);
+  if (profileData.hasProfile) {
+    setProfileCompleteStatus(true);
+    navigate("/search");
+  } else {
+    setProfileCompleteStatus(false);
+    navigate("/onboarding");
   }
-
-  const hasProfile =
-    localStorage.getItem("accessmap_profile_complete") === "true";
-
-  navigate(hasProfile ? '/search' : '/onboarding');
 
 } catch (err) {
   setError(err.message);
@@ -150,7 +150,7 @@ return ( <div className="am-screen has-noise"> <CollageBg color="var(--coral-sof
             color: 'var(--ink-muted)',
           }}
         >
-          no password needed · this is just the demo
+
         </p>
       </div>
     </div>

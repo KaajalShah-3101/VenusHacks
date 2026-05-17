@@ -22,6 +22,9 @@ export const api = {
   saveProfile: (profile) =>
     request('/profile', { method: 'POST', body: JSON.stringify(profile) }),
 
+  getProfile: (userId) =>
+    request(`/profile/${encodeURIComponent(userId)}`),
+
   searchVenues: ({ q, lat, lng }) => {
     const params = new URLSearchParams({ lat: String(lat), lng: String(lng) });
     if (q) params.set('q', q);

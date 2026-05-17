@@ -28,6 +28,10 @@ export function AuthProvider({ children }) {
         if (next) localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
         else localStorage.removeItem(STORAGE_KEY);
       },
+      setProfileCompleteStatus: (status) => {
+        setProfileComplete(status);
+        localStorage.setItem('accessmap_profile_complete', status ? 'true' : 'false');
+      },
       markProfileComplete: () => {
         setProfileComplete(true);
         localStorage.setItem('accessmap_profile_complete', 'true');
