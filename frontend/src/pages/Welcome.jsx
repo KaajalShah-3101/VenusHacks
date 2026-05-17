@@ -2,6 +2,11 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { api } from '../api/client';
 import { useAuth } from '../context/AuthContext';
+import Nor from '../components/mascot/Nor';
+import Sticker from '../components/mascot/Sticker';
+import SquiggleUnderline from '../components/mascot/SquiggleUnderline';
+import CollageBg from '../components/collage/CollageBg';
+import ScatteredStickers from '../components/collage/ScatteredStickers';
 
 export default function Welcome() {
   const [email, setEmail] = useState('');
@@ -27,44 +32,110 @@ export default function Welcome() {
   }
 
   return (
-    <div className="max-w-md mx-auto text-center space-y-8 py-8">
-      <div>
-        <h1 className="font-display text-4xl text-coral m-0">AccessMap</h1>
-        <p className="text-[#6b6560] mt-4 leading-relaxed">
-          Find venues that match <em>your</em> accessibility needs — not a single wheelchair icon.
-        </p>
+    <div className="am-screen has-noise">
+      <CollageBg color="var(--coral-soft)" />
+      <ScatteredStickers variant="signin" />
+
+      <div className="collage-signin-wrap">
+        <div className="collage-signin-card-outer">
+          <div className="collage-signin-card-back" aria-hidden="true" />
+          <div className="sticker-card" style={{ padding: '40px 32px 28px', position: 'relative' }}>
+            <div className="tape sage" style={{ top: -12, left: 36, transform: 'rotate(-8deg)' }} />
+            <div className="tape lavender" style={{ top: -10, right: 40, transform: 'rotate(10deg)' }} />
+            <div className="tape berry" style={{ bottom: -12, right: 48, transform: 'rotate(-4deg)' }} />
+
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: 10 }}>
+              <div style={{ position: 'relative' }}>
+                <Nor size={100} waving />
+                <div
+                  className="hand"
+                  style={{
+                    position: 'absolute',
+                    left: '100%',
+                    top: 8,
+                    marginLeft: 4,
+                    background: 'var(--sage-soft)',
+                    border: '2px solid var(--sage-deep)',
+                    padding: '6px 12px',
+                    borderRadius: 16,
+                    fontSize: 17,
+                    color: 'var(--sage-deep)',
+                    whiteSpace: 'nowrap',
+                    transform: 'rotate(4deg)',
+                  }}
+                >
+                  hi, I&apos;m Nor!
+                </div>
+              </div>
+              <div className="am-wordmark" style={{ fontSize: 48, marginTop: 4 }}>
+                <span className="via">Via</span>nor
+              </div>
+              <SquiggleUnderline width={200} />
+            </div>
+
+            <p
+              style={{
+                textAlign: 'center',
+                color: 'var(--ink-soft)',
+                fontSize: 15,
+                lineHeight: 1.5,
+                margin: '0 0 22px',
+              }}
+            >
+              Find venues that match{' '}
+              <em className="hand" style={{ fontSize: 20, color: 'var(--coral-deep)' }}>
+                your
+              </em>{' '}
+              accessibility needs — not a single wheelchair icon.
+            </p>
+
+            <form onSubmit={handleSubmit}>
+              <label className="am-label">✉️ Email</label>
+              <input
+                type="email"
+                required
+                autoComplete="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="you@example.com"
+                className="am-input"
+                style={{ marginBottom: 14 }}
+              />
+              {error && (
+                <p className="am-alert" role="alert" style={{ marginBottom: 12 }}>
+                  {error}
+                </p>
+              )}
+              <button type="submit" disabled={loading} className="am-btn big">
+                {loading ? 'One moment…' : (
+                  <>
+                    Let&apos;s go <span style={{ marginLeft: 8 }}>✿</span>
+                  </>
+                )}
+              </button>
+            </form>
+
+            <p
+              className="hand"
+              style={{
+                textAlign: 'center',
+                marginTop: 14,
+                fontSize: 16,
+                color: 'var(--ink-muted)',
+              }}
+            >
+              no password needed · this is just the demo
+            </p>
+          </div>
+        </div>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-4 text-left">
-        <label className="block">
-          <span className="text-sm font-medium text-[#3d3832]">Email</span>
-          <input
-            type="email"
-            required
-            autoComplete="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="you@example.com"
-            className="mt-1.5 w-full px-4 py-3 rounded-xl border-2 border-salmon/30 bg-white/70 focus:border-coral focus:outline-none text-[#3d3832]"
-          />
-        </label>
-        {error && (
-          <p className="text-sm text-coral bg-coral/10 px-3 py-2 rounded-lg" role="alert">
-            {error}
-          </p>
-        )}
-        <button
-          type="submit"
-          disabled={loading}
-          className="w-full py-3 rounded-xl bg-coral text-white font-semibold hover:bg-coral/90 disabled:opacity-60 transition-colors cursor-pointer border-0"
-        >
-          {loading ? 'Signing in…' : 'Continue'}
-        </button>
-      </form>
-
-      <p className="text-xs text-[#8a8480]">
-        We use a simple email sign-in for the hackathon demo. No password needed.
-      </p>
+      <Sticker
+        kind="star"
+        size={44}
+        rotate={-10}
+        style={{ position: 'absolute', top: 200, right: 24, pointerEvents: 'none' }}
+      />
     </div>
   );
 }
