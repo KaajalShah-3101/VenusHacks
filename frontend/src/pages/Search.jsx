@@ -78,7 +78,6 @@ try {
   setLoading(false);
 }
 
-
 }
 
 function useMyLocation() {
@@ -105,9 +104,11 @@ const displayList = showDemo ? DEMO_VENUES : venues;
 return (
 <> <Header />
 
+
   <section style={{ position: "relative" }}>
-    {/* 🐝 FLYING NOR */}
+    {/* 🐝 FLYING NOR (UPDATED) */}
     <div
+      className="nor-glow"
       style={{
         position: "absolute",
         left: norPos.x ?? "auto",
@@ -115,10 +116,9 @@ return (
         right: norPos.x === null ? 10 : "auto",
         bottom: norPos.y === null ? -10 : "auto",
         transform: "translate(-50%, -50%)",
-        transition: "all 1s cubic-bezier(0.22, 1, 0.36, 1)",
+        transition: "all 1.2s cubic-bezier(0.22, 1, 0.36, 1)",
         zIndex: 5,
         pointerEvents: "none",
-        filter: "drop-shadow(0 0 6px rgba(255,215,0,0.6))",
       }}
     >
       <Nor size={60} />
@@ -191,6 +191,7 @@ return (
 
     {/* MAP */}
     <div
+      className="map-card"
       style={{
         borderRadius: 24,
         overflow: "hidden",
