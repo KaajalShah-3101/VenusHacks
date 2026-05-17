@@ -24,10 +24,12 @@ const [error, setError] = useState('');
 const [showDemo, setShowDemo] = useState(true);
 const [selected, setSelected] = useState(null);
 
-// 🐝 Nor position (starts bottom-right)
-const [norPos, setNorPos] = useState({ x: null, y: null });
+// 🐝 Nor position
+const [norPos, setNorPos] = useState({ x: 320, y: 320 });
 
-// 📍 ref for map container
+// ✨ Sparkles
+const [sparkles, setSparkles] = useState([]);
+
 const mapRef = useRef(null);
 
 const fetchScores = useCallback(async (list) => {
@@ -48,6 +50,20 @@ setScores((prev) => ({ ...prev, ...next }));
 useEffect(() => {
 fetchScores(DEMO_VENUES);
 }, [fetchScores]);
+
+// ✨ Clean up sparkles over time
+useEffect(() => {
+if (sparkles.length === 0) return;
+
+
+const timeout = setTimeout(() => {
+  setSparkles((s) => s.slice(10));
+}, 200);
+
+return () => clearTimeout(timeout);
+
+
+}, [sparkles]);
 
 async function handleSearch(e) {
 e.preventDefault();
@@ -90,6 +106,7 @@ navigator.geolocation.getCurrentPosition(
   () => setError('Could not get your location.')
 );
 
+
 }
 
 const displayList = showDemo ? DEMO_VENUES : venues;
@@ -99,6 +116,7 @@ return (
 
 
   <section>
+
     {/* HEADER */}
     <header
       style={{
@@ -181,24 +199,48 @@ return (
         center={{ lat, lng }}
         onSelect={(v) => setSelected(v)}
         onMapClick={({ x, y }) => {
-          const rect = mapRef.current.getBoundingClientRect();
+          setNorPos((prev) => {
+            if (prev.x === null) return { x, y };
 
-          setNorPos({
-            x,
-            y,
+            const newSparkles = [];
+
+            for (let i = 0; i < 25; i++) {
+              newSparkles.push({
+                id: Math.random(),
+                x: prev.x + (x - prev.x) * (i / 25),
+                y: prev.y + (y - prev.y) * (i / 25),
+              });
+            }
+
+            setSparkles((s) => [...s, ...newSparkles]);
+
+            return { x, y };
           });
         }}
       />
 
-      {/* 🐝 NOR INSIDE MAP */}
+      {/* ✨ SPARKLES */}
+      {sparkles.map((s) => (
+        <div
+          key={s.id}
+          className="sparkle"
+          style={{
+            position: "absolute",
+            left: s.x,
+            top: s.y,
+          }}
+        />
+      ))}
+
+      {/* 🐝 NOR */}
       <div
         className="nor-glow"
         style={{
           position: "absolute",
-          left: norPos.x ?? "auto",
-          top: norPos.y ?? "auto",
-          right: norPos.x === null ? 10 : "auto",
-          bottom: norPos.y === null ? 10 : "auto",
+          left: norPos.x,
+          top: norPos.y,
+          right: norPos.x,
+          bottom: norPos.y,
           transform: "translate(-50%, -50%)",
           transition: "all 1.2s cubic-bezier(0.22, 1, 0.36, 1)",
           pointerEvents: "none",

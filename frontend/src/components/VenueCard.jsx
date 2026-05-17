@@ -1,6 +1,8 @@
 import { Link } from 'react-router-dom';
 import Sticker from './mascot/Sticker';
 import { VENUE_STICKERS, VENUE_TAGS, fitBadgeClass } from '../lib/venueMeta';
+import { toggleSaved, isSaved } from "../utils/savedPlaces";
+import { useState, useEffect } from "react";
 
 export default function VenueCard({ venue, matchScore }) {
   const placeId = venue.google_place_id;
