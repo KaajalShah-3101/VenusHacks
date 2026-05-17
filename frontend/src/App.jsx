@@ -1,6 +1,6 @@
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
-import Layout from './components/Layout';
+import CollageLayout from './components/collage/CollageLayout';
 import ProtectedRoute from './components/ProtectedRoute';
 import Welcome from './pages/Welcome';
 import Onboarding from './pages/Onboarding';
@@ -19,9 +19,9 @@ export default function App() {
             path="/onboarding"
             element={
               <ProtectedRoute>
-                <Layout>
+                <CollageLayout>
                   <Onboarding />
-                </Layout>
+                </CollageLayout>
               </ProtectedRoute>
             }
           />
@@ -29,9 +29,9 @@ export default function App() {
             path="/search"
             element={
               <ProtectedRoute requireProfile>
-                <Layout>
+                <CollageLayout>
                   <Search />
-                </Layout>
+                </CollageLayout>
               </ProtectedRoute>
             }
           />
@@ -39,9 +39,9 @@ export default function App() {
             path="/venue/:placeId"
             element={
               <ProtectedRoute requireProfile>
-                <Layout>
+                <CollageLayout>
                   <VenueDetail />
-                </Layout>
+                </CollageLayout>
               </ProtectedRoute>
             }
           />
@@ -49,9 +49,9 @@ export default function App() {
             path="/venue/:placeId/review"
             element={
               <ProtectedRoute requireProfile>
-                <Layout>
+                <CollageLayout>
                   <ReviewForm />
-                </Layout>
+                </CollageLayout>
               </ProtectedRoute>
             }
           />
@@ -59,9 +59,9 @@ export default function App() {
             path="/profile"
             element={
               <ProtectedRoute>
-                <Layout>
+                <CollageLayout>
                   <Profile />
-                </Layout>
+                </CollageLayout>
               </ProtectedRoute>
             }
           />

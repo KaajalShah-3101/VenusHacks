@@ -42,11 +42,7 @@ function TriState({ label, value, onChange }) {
             key={String(opt.val)}
             type="button"
             onClick={() => onChange(opt.val)}
-            className={`px-4 py-2 rounded-full text-sm border-2 cursor-pointer ${
-              value === opt.val
-                ? 'bg-coral text-white border-coral'
-                : 'bg-white/60 border-salmon/40 text-[#5c5650]'
-            }`}
+            className={`am-chip ${value === opt.val ? 'selected' : ''}`}
           >
             {opt.label}
           </button>
@@ -118,12 +114,14 @@ export default function ReviewForm() {
       </Link>
 
       <div>
-        <h1 className="font-display text-3xl text-coral m-0">Share your visit</h1>
-        <p className="text-[#6b6560] mt-1">{venue.name}</p>
+        <h1 className="script-title" style={{ fontSize: 40, margin: 0 }}>
+          Share your visit
+        </h1>
+        <p style={{ color: 'var(--ink-soft)', marginTop: 4 }}>{venue.name}</p>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-8">
-        <section className="p-6 rounded-2xl bg-white/50 border border-salmon/25 space-y-6">
+        <section className="sticker-card" style={{ padding: 20, display: 'flex', flexDirection: 'column', gap: 16 }}>
           <h2 className="text-base font-semibold m-0">How was the noise?</h2>
           <SliderField
             label="Noise level (1 = very loud, 5 = very quiet)"
@@ -134,7 +132,7 @@ export default function ReviewForm() {
           />
         </section>
 
-        <section className="p-6 rounded-2xl bg-white/50 border border-salmon/25 space-y-6">
+        <section className="sticker-card" style={{ padding: 20, display: 'flex', flexDirection: 'column', gap: 16 }}>
           <h2 className="text-base font-semibold m-0">Mobility & entrance</h2>
           <SliderField
             label="Overall mobility access"
@@ -155,7 +153,7 @@ export default function ReviewForm() {
           />
         </section>
 
-        <section className="p-6 rounded-2xl bg-white/50 border border-salmon/25 space-y-6">
+        <section className="sticker-card" style={{ padding: 20, display: 'flex', flexDirection: 'column', gap: 16 }}>
           <h2 className="text-base font-semibold m-0">Sensory & comfort</h2>
           <SliderField
             label="Lighting (1 = harsh, 5 = comfortable)"
@@ -182,7 +180,7 @@ export default function ReviewForm() {
         <button
           type="submit"
           disabled={saving}
-          className="w-full py-3 rounded-xl bg-coral text-white font-semibold border-0 cursor-pointer hover:bg-coral/90 disabled:opacity-60"
+          className="am-btn big"
         >
           {saving ? 'Submitting…' : 'Submit review'}
         </button>

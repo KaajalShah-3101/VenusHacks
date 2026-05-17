@@ -63,8 +63,10 @@ export default function Profile() {
   return (
     <div className="max-w-lg mx-auto space-y-6">
       <div>
-        <h1 className="font-display text-3xl text-coral m-0">Your profile</h1>
-        <p className="text-[#6b6560] mt-2">
+        <h1 className="script-title" style={{ fontSize: 40, margin: 0 }}>
+          Your profile
+        </h1>
+        <p style={{ color: 'var(--ink-soft)', marginTop: 8 }}>
           Update what matters to you. Match scores recalculate from these weights.
         </p>
       </div>
@@ -73,7 +75,8 @@ export default function Profile() {
         {FIELDS.map(({ field, label, description }) => (
           <section
             key={field}
-            className="p-5 rounded-2xl bg-white/50 border border-salmon/25"
+            className="sticker-card"
+            style={{ padding: 20 }}
           >
             <WeightSelector
               label={label}
@@ -94,7 +97,7 @@ export default function Profile() {
         <button
           type="submit"
           disabled={saving}
-          className="w-full py-3 rounded-xl bg-coral text-white font-semibold border-0 cursor-pointer"
+          className="am-btn big"
         >
           {saving ? 'Saving…' : 'Save changes'}
         </button>
