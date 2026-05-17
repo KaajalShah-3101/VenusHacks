@@ -242,7 +242,7 @@ return (
     {/* 📸 PHOTOS SECTION */}
     <section style={{ marginBottom: 20 }}>
       <h2 className="hand" style={{ fontSize: 18, marginBottom: 10 }}>
-        Accessibility photos
+      Accessibility photos
       </h2>
 
       <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
