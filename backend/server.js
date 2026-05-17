@@ -1,10 +1,9 @@
+require('dotenv').config();
+
 const express = require("express");
 const cors = require("cors");
-const dotenv = require("dotenv");
 const axios = require("axios");
 const { createClient } = require("@supabase/supabase-js");
-
-dotenv.config();
 
 const app = express();
 
@@ -16,6 +15,21 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY
 );
 
+/*
+YOUR ROUTES
+*/
+const venueRoutes = require('./routes/venues');
+const reviewRoutes = require('./routes/reviews');
+const matchRoutes = require('./routes/match');
+
+app.use('/venues', venueRoutes);
+app.use('/reviews', reviewRoutes);
+app.use('/venues', reviewRoutes);
+app.use('/venues', matchRoutes);
+
+/*
+TEAMMATE ROUTES
+*/
 app.get("/", (req, res) => {
   res.json({ message: "Backend is running" });
 });
@@ -47,7 +61,6 @@ app.post("/signup", async (req, res) => {
   }
 });
 
-const PORT = process.env.PORT || 5001;
 app.post("/profile", async (req, res) => {
   try {
     const {
@@ -90,6 +103,7 @@ app.post("/profile", async (req, res) => {
     res.status(500).json({ error: "Server error" });
   }
 });
+
 app.get("/venues", async (req, res) => {
   try {
     const { q, lat, lng } = req.query;
@@ -134,7 +148,6 @@ app.get("/venues", async (req, res) => {
       address: place.formattedAddress || null,
       lat: place.location?.latitude || null,
       lng: place.location?.longitude || null,
-      photo_url: place.photos?.[0]?.name || null,
     }));
 
     for (const venue of venues) {
@@ -152,6 +165,7 @@ app.get("/venues", async (req, res) => {
     res.status(500).json({ error: "Failed to fetch venues" });
   }
 });
+
 app.get("/venues/:id", async (req, res) => {
   try {
     const { id } = req.params;
@@ -200,6 +214,7 @@ app.get("/venues/:id", async (req, res) => {
     res.status(500).json({ error: "Server error" });
   }
 });
+
 app.post("/login", async (req, res) => {
   try {
     const { email } = req.body;
@@ -240,6 +255,7 @@ app.post("/login", async (req, res) => {
     res.status(500).json({ error: "Server error" });
   }
 });
+
 app.post("/venues/:id/reviews", async (req, res) => {
   try {
     const { id } = req.params;
@@ -299,6 +315,9 @@ app.post("/venues/:id/reviews", async (req, res) => {
     res.status(500).json({ error: "Server error" });
   }
 });
+
+const PORT = process.env.PORT || 5001;
+
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
