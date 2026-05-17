@@ -49,7 +49,7 @@ disableDefaultUI: true,
 export default function MapView({ venues, center, onSelect, onMapClick }) {
 const [showStreetView, setShowStreetView] = useState(false);
 
-return ( <LoadScript googleMapsApiKey="AIzaSyDUafFWC75_ZlRh7t2bXGKa0fBfwXK0suI">
+return ( <LoadScript googleMapsApiKey={import.meta.env.VITE_GOOGLE_MAPS_API_KEY}>
 <GoogleMap
 mapContainerStyle={containerStyle}
 center={center}
