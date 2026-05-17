@@ -316,6 +316,32 @@ app.post("/venues/:id/reviews", async (req, res) => {
   }
 });
 
+app.get("/profile/:userId", async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    const { data, error } = await supabase
+      .from("user_profiles")
+      .select("*")
+      .eq("user_id", userId)
+      .single();
+
+    if (error && error.code === "PGRST116") {
+      return res.json({ hasProfile: false, profile: null });
+    }
+
+    if (error) {
+      return res.status(400).json({ error: error.message });
+    }
+
+    res.json({ hasProfile: true, profile: data });
+  } catch (err) {
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
+
+
 const PORT = process.env.PORT || 5001;
 
 app.listen(PORT, () => {
