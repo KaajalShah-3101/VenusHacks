@@ -70,13 +70,21 @@ setSaving(true);
 setError('');
 try {
 await api.saveProfile({ user_id: user.id, ...weights });
-markProfileComplete();
-navigate('/search');
+
+
+  markProfileComplete();
+
+  // ✅ persist onboarding completion
+  localStorage.setItem("accessmap_profile_complete", "true");
+
+  navigate('/search');
 } catch (err) {
-setError(err.message);
+  setError(err.message);
 } finally {
-setSaving(false);
+  setSaving(false);
 }
+
+
 }
 
 function handleNext() {
@@ -85,8 +93,9 @@ else setStep((s) => s + 1);
 }
 
 return (
-<>
-<Header />
+<> <Header />
+
+
   <div>
     <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 20, overflowX: 'auto' }}>
       {ONBOARDING_TRAIL.map((label, i) => (
@@ -121,8 +130,9 @@ return (
               {label}
             </span>
           </div>
+
           {i < ONBOARDING_TRAIL.length - 1 && (
-            <svg width="40" height="16" viewBox="0 0 80 20" aria-hidden="true">
+            <svg width="40" height="16" viewBox="0 0 80 20">
               <path
                 d="M2 10 Q 20 -2 40 10 T 78 10"
                 stroke="var(--coral-soft)"
@@ -146,37 +156,43 @@ return (
           {current.title}
         </div>
         <SquiggleUnderline width={180} />
-        <p style={{ color: 'var(--ink-soft)', fontSize: 15, margin: '4px 0 0' }}>{current.subtitle}</p>
+        <p style={{ color: 'var(--ink-soft)', fontSize: 15, margin: '4px 0 0' }}>
+          {current.subtitle}
+        </p>
       </div>
     </div>
 
     <div className="sticker-card" style={{ padding: 24, marginBottom: 20, transform: 'rotate(-0.5deg)' }}>
       <div className="tape butter" style={{ top: -12, left: 48, transform: 'rotate(-6deg)' }} />
       <div className="tape sage" style={{ top: -10, right: 48, transform: 'rotate(8deg)' }} />
+
       <WeightSelector
         label="For you, this is…"
         description={current.description}
         value={weights[current.field]}
         onChange={(v) => setWeight(current.field, v)}
       />
-      <div style={{ position: 'absolute', bottom: -18, right: 12, pointerEvents: 'none' }}>
+
+      <div style={{ position: 'absolute', bottom: -18, right: 12 }}>
         <Nor size={64} expression="happy" />
       </div>
     </div>
 
-    {error && <p className="am-alert" role="alert">{error}</p>}
+    {error && <p className="am-alert">{error}</p>}
 
     <div style={{ display: 'flex', gap: 12 }}>
       {step > 0 && (
-        <button type="button" onClick={() => setStep((s) => s - 1)} className="am-btn ghost">
+        <button onClick={() => setStep((s) => s - 1)} className="am-btn ghost">
           ← Back
         </button>
       )}
-      <button type="button" onClick={handleNext} disabled={saving} className="am-btn" style={{ flex: 1 }}>
+
+      <button onClick={handleNext} disabled={saving} className="am-btn" style={{ flex: 1 }}>
         {saving ? 'Saving…' : isLast ? 'Find venues ✿' : 'Next step →'}
       </button>
     </div>
   </div>
 </>
+
 );
 }

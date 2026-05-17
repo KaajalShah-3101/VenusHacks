@@ -10,7 +10,7 @@ We need this because reviews have to be saved and fetched from tables.
 */
 const supabase = createClient(
   process.env.SUPABASE_URL,
-  process.env.SUPABASE_ANON_KEY
+  process.env.SUPABASE_KEY
 );
 
 /*
