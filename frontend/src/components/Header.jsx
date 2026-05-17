@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import Nor from "../components/Nor";
+import Nor from "./mascot/Nor";
 
 export default function Header() {
   return (
