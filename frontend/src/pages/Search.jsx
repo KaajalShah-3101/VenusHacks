@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState, useRef } from 'react';
 import { api, DEMO_VENUES } from '../api/client';
 import { useAuth } from '../context/AuthContext';
 import VenueCard from '../components/VenueCard';
@@ -24,8 +24,11 @@ const [error, setError] = useState('');
 const [showDemo, setShowDemo] = useState(true);
 const [selected, setSelected] = useState(null);
 
-// 🐝 Nor position (null = bottom start)
+// 🐝 Nor position (starts bottom-right)
 const [norPos, setNorPos] = useState({ x: null, y: null });
+
+// 📍 ref for map container
+const mapRef = useRef(null);
 
 const fetchScores = useCallback(async (list) => {
 const next = {};
@@ -45,16 +48,6 @@ setScores((prev) => ({ ...prev, ...next }));
 useEffect(() => {
 fetchScores(DEMO_VENUES);
 }, [fetchScores]);
-
-// // 🐝 fly when a venue is selected
-// useEffect(() => {
-// if (selected) {
-// setNorPos({
-// x: 220,
-// y: 140,
-// });
-// }
-// }, [selected]);
 
 async function handleSearch(e) {
 e.preventDefault();
@@ -78,6 +71,7 @@ try {
   setLoading(false);
 }
 
+
 }
 
 function useMyLocation() {
@@ -96,7 +90,6 @@ navigator.geolocation.getCurrentPosition(
   () => setError('Could not get your location.')
 );
 
-
 }
 
 const displayList = showDemo ? DEMO_VENUES : venues;
@@ -105,25 +98,7 @@ return (
 <> <Header />
 
 
-  <section style={{ position: "relative" }}>
-    {/* 🐝 FLYING NOR (UPDATED) */}
-    <div
-      className="nor-glow"
-      style={{
-        position: "absolute",
-        left: norPos.x ?? "auto",
-        top: norPos.y ?? "auto",
-        right: norPos.x === null ? 10 : "auto",
-        bottom: norPos.y === null ? -10 : "auto",
-        transform: "translate(-50%, -50%)",
-        transition: "all 1.2s cubic-bezier(0.22, 1, 0.36, 1)",
-        zIndex: 5,
-        pointerEvents: "none",
-      }}
-    >
-      <Nor size={60} />
-    </div>
-
+  <section>
     {/* HEADER */}
     <header
       style={{
@@ -189,8 +164,9 @@ return (
       )}
     </form>
 
-    {/* MAP */}
+    {/* 🗺 MAP + NOR */}
     <div
+      ref={mapRef}
       className="map-card"
       style={{
         borderRadius: 24,
@@ -203,14 +179,35 @@ return (
       <MapView
         venues={displayList}
         center={{ lat, lng }}
-        onSelect={(v) => {setSelected(v);
-      }}
-      onMapClick={({ x, y }) => {
-        setNorPos({ x, y });
-      }}
-      />
-    </div>
+        onSelect={(v) => setSelected(v)}
+        onMapClick={({ x, y }) => {
+          const rect = mapRef.current.getBoundingClientRect();
 
+          setNorPos({
+            x,
+            y,
+          });
+        }}
+      />
+
+      {/* 🐝 NOR INSIDE MAP */}
+      <div
+        className="nor-glow"
+        style={{
+          position: "absolute",
+          left: norPos.x ?? "auto",
+          top: norPos.y ?? "auto",
+          right: norPos.x === null ? 10 : "auto",
+          bottom: norPos.y === null ? 10 : "auto",
+          transform: "translate(-50%, -50%)",
+          transition: "all 1.2s cubic-bezier(0.22, 1, 0.36, 1)",
+          pointerEvents: "none",
+          zIndex: 5,
+        }}
+      >
+        <Nor size={60} />
+      </div>
+    </div>
 
     {/* DEMO LABEL */}
     {showDemo && (
