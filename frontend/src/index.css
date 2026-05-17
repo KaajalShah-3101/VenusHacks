@@ -1,0 +1,15 @@
+@import 'tailwindcss';
+@import './styles/vianor.css';
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: var(--ui);
+  background: #e8decb;
+  color: var(--ink);
+  -webkit-font-smoothing: antialiased;
+}
+
+#root {
+  min-height: 100vh;
+}
