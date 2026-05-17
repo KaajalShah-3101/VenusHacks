@@ -240,6 +240,65 @@ app.post("/login", async (req, res) => {
     res.status(500).json({ error: "Server error" });
   }
 });
+app.post("/venues/:id/reviews", async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const {
+      user_id,
+      mobility_score,
+      noise_score,
+      lighting_score,
+      seating_score,
+      door_width_ok,
+      has_step,
+      visited_at,
+      notes,
+      user_match_score,
+    } = req.body;
+
+    if (
+      user_match_score !== undefined &&
+      (user_match_score < 0 || user_match_score > 100)
+    ) {
+      return res.status(400).json({
+        error: "user_match_score must be between 0 and 100",
+      });
+    }
+
+    const { data, error } = await supabase
+      .from("accessibility_reviews")
+      .insert([
+        {
+          venue_id: id,
+          user_id: user_id || null,
+          mobility_score,
+          noise_score,
+          lighting_score,
+          seating_score,
+          door_width_ok,
+          has_step,
+          visited_at,
+          notes,
+          user_match_score,
+        },
+      ])
+      .select()
+      .single();
+
+    if (error) {
+      return res.status(400).json({ error: error.message });
+    }
+
+    res.status(201).json({
+      message: "Review submitted",
+      review: data,
+    });
+  } catch (err) {
+    console.error("Review submit error:", err);
+    res.status(500).json({ error: "Server error" });
+  }
+});
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
