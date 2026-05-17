@@ -3,35 +3,43 @@ import { useNavigate } from 'react-router-dom';
 import { api } from '../api/client';
 import { useAuth } from '../context/AuthContext';
 import WeightSelector from '../components/WeightSelector';
+import Nor from '../components/mascot/Nor';
+import Sticker from '../components/mascot/Sticker';
+import SquiggleUnderline from '../components/mascot/SquiggleUnderline';
+import { ONBOARDING_STICKERS, ONBOARDING_TRAIL } from '../lib/venueMeta';
 
 const STEPS = [
   {
-    id: 'mobility',
+    trailLabel: 'Mobility',
     title: 'Mobility',
     subtitle: 'Ramps, door width, elevators, parking',
     field: 'mobility_weight',
     description: 'How important is step-free access and room to move?',
+    stepLabel: 'step one',
   },
   {
-    id: 'sensory-noise',
-    title: 'Sensory — Noise',
+    trailLabel: 'Sensory',
+    title: 'Sensory',
     subtitle: 'Quiet spaces, low background sound',
     field: 'noise_weight',
     description: 'How much does noise level affect whether you can enjoy a place?',
+    stepLabel: 'step two',
   },
   {
-    id: 'sensory-light',
-    title: 'Sensory — Lighting',
+    trailLabel: 'Cognitive',
+    title: 'Lighting',
     subtitle: 'Harsh fluorescents vs. comfortable light',
     field: 'lighting_weight',
     description: 'How sensitive are you to bright or flickering lighting?',
+    stepLabel: 'step three',
   },
   {
-    id: 'comfort',
-    title: 'Comfort & seating',
+    trailLabel: 'Vibe',
+    title: 'Vibe',
     subtitle: 'Seating, crowding, wait times',
     field: 'seating_weight',
     description: 'How much do available seating and comfortable spacing matter?',
+    stepLabel: 'step four',
   },
 ];
 
@@ -50,6 +58,7 @@ export default function Onboarding() {
 
   const current = STEPS[step];
   const isLast = step === STEPS.length - 1;
+  const stickerKind = ONBOARDING_STICKERS[step];
 
   function setWeight(field, value) {
     setWeights((prev) => ({ ...prev, [field]: value }));
@@ -59,10 +68,7 @@ export default function Onboarding() {
     setSaving(true);
     setError('');
     try {
-      await api.saveProfile({
-        user_id: user.id,
-        ...weights,
-      });
+      await api.saveProfile({ user_id: user.id, ...weights });
       markProfileComplete();
       navigate('/search');
     } catch (err) {
@@ -78,54 +84,93 @@ export default function Onboarding() {
   }
 
   return (
-    <div className="max-w-lg mx-auto space-y-8">
-      <div>
-        <p className="text-sm text-sage font-medium m-0">
-          Step {step + 1} of {STEPS.length}
-        </p>
-        <h1 className="font-display text-3xl text-coral mt-2 mb-1">{current.title}</h1>
-        <p className="text-[#6b6560] m-0">{current.subtitle}</p>
+    <div>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 20, overflowX: 'auto' }}>
+        {ONBOARDING_TRAIL.map((label, i) => (
+          <div key={label} style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
+              <div
+                style={{
+                  width: 44,
+                  height: 44,
+                  borderRadius: '50%',
+                  background: i === step ? 'var(--coral)' : 'var(--cream-2)',
+                  border: i === step ? '2px solid var(--coral-deep)' : '2px dashed var(--coral-soft)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: i === step ? 'white' : 'var(--ink-muted)',
+                  fontWeight: 800,
+                  fontSize: 16,
+                  transform: i === step ? 'rotate(-5deg)' : 'none',
+                  boxShadow: i === step ? '0 3px 0 var(--coral-deep)' : 'none',
+                }}
+              >
+                {i + 1}
+              </div>
+              <span
+                className="hand"
+                style={{
+                  fontSize: 13,
+                  color: i === step ? 'var(--coral-deep)' : 'var(--ink-muted)',
+                }}
+              >
+                {label}
+              </span>
+            </div>
+            {i < ONBOARDING_TRAIL.length - 1 && (
+              <svg width="40" height="16" viewBox="0 0 80 20" aria-hidden="true">
+                <path
+                  d="M2 10 Q 20 -2 40 10 T 78 10"
+                  stroke="var(--coral-soft)"
+                  strokeWidth="2"
+                  strokeDasharray="3 4"
+                  fill="none"
+                />
+              </svg>
+            )}
+          </div>
+        ))}
       </div>
 
-      <div className="h-1.5 rounded-full bg-white/70 overflow-hidden">
-        <div
-          className="h-full bg-sage transition-all duration-300"
-          style={{ width: `${((step + 1) / STEPS.length) * 100}%` }}
-        />
+      <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 16 }}>
+        <Sticker kind={stickerKind} size={64} rotate={-12} />
+        <div>
+          <div className="hand" style={{ color: 'var(--sage-deep)', fontSize: 18 }}>
+            {current.stepLabel} ·
+          </div>
+          <div className="script-title" style={{ fontSize: 48 }}>
+            {current.title}
+          </div>
+          <SquiggleUnderline width={180} />
+          <p style={{ color: 'var(--ink-soft)', fontSize: 15, margin: '4px 0 0' }}>{current.subtitle}</p>
+        </div>
       </div>
 
-      <section className="p-6 rounded-2xl bg-white/50 border border-salmon/25">
+      <div className="sticker-card" style={{ padding: 24, marginBottom: 20, transform: 'rotate(-0.5deg)' }}>
+        <div className="tape butter" style={{ top: -12, left: 48, transform: 'rotate(-6deg)' }} />
+        <div className="tape sage" style={{ top: -10, right: 48, transform: 'rotate(8deg)' }} />
         <WeightSelector
           label="For you, this is…"
           description={current.description}
           value={weights[current.field]}
           onChange={(v) => setWeight(current.field, v)}
         />
-      </section>
+        <div style={{ position: 'absolute', bottom: -18, right: 12, pointerEvents: 'none' }}>
+          <Nor size={64} expression="happy" />
+        </div>
+      </div>
 
-      {error && (
-        <p className="text-sm text-coral" role="alert">
-          {error}
-        </p>
-      )}
+      {error && <p className="am-alert" role="alert">{error}</p>}
 
-      <div className="flex gap-3">
+      <div style={{ display: 'flex', gap: 12 }}>
         {step > 0 && (
-          <button
-            type="button"
-            onClick={() => setStep((s) => s - 1)}
-            className="flex-1 py-3 rounded-xl border-2 border-salmon/40 text-[#5c5650] font-medium bg-transparent cursor-pointer hover:border-coral/50"
-          >
-            Back
+          <button type="button" onClick={() => setStep((s) => s - 1)} className="am-btn ghost">
+            ← Back
           </button>
         )}
-        <button
-          type="button"
-          onClick={handleNext}
-          disabled={saving}
-          className="flex-1 py-3 rounded-xl bg-coral text-white font-semibold border-0 cursor-pointer hover:bg-coral/90 disabled:opacity-60"
-        >
-          {saving ? 'Saving…' : isLast ? 'Find venues' : 'Next'}
+        <button type="button" onClick={handleNext} disabled={saving} className="am-btn" style={{ flex: 1 }}>
+          {saving ? 'Saving…' : isLast ? 'Find venues ✿' : 'Next step →'}
         </button>
       </div>
     </div>

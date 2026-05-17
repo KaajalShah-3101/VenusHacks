@@ -1,37 +1,41 @@
+import Sticker from './mascot/Sticker';
+
 const OPTIONS = [
-  { value: 0, label: 'Not needed' },
-  { value: 1, label: 'Helpful' },
-  { value: 2, label: 'Essential' },
+  { value: 0, label: 'Not needed', emoji: '😌' },
+  { value: 1, label: 'Helpful', emoji: '🌿' },
+  { value: 2, label: 'Essential', emoji: '⭐' },
 ];
 
 export default function WeightSelector({ label, description, value, onChange }) {
   return (
     <fieldset className="border-0 p-0 m-0">
-      <legend className="text-base font-semibold text-[#3d3832] mb-1">{label}</legend>
+      <legend style={{ fontSize: 22, fontWeight: 800, marginBottom: 6 }}>{label}</legend>
       {description && (
-        <p className="text-sm text-[#6b6560] mb-3 leading-relaxed">{description}</p>
+        <p style={{ color: 'var(--ink-soft)', fontSize: 15, margin: '0 0 20px' }}>{description}</p>
       )}
-      <div className="flex flex-wrap gap-2" role="radiogroup" aria-label={label}>
+      <div className="flex flex-wrap gap-3" role="radiogroup" aria-label={label}>
         {OPTIONS.map((opt) => {
           const selected = value === opt.value;
           return (
-            <button
-              key={opt.value}
-              type="button"
-              role="radio"
-              aria-checked={selected}
-              onClick={() => onChange(opt.value)}
-              className={`
-                px-4 py-2 rounded-full text-sm font-medium transition-all border-2 cursor-pointer
-                ${
-                  selected
-                    ? 'bg-coral text-white border-coral shadow-sm'
-                    : 'bg-white/60 text-[#5c5650] border-salmon/40 hover:border-coral/50'
-                }
-              `}
-            >
-              {opt.label}
-            </button>
+            <div key={opt.value} style={{ position: 'relative' }}>
+              <button
+                type="button"
+                role="radio"
+                aria-checked={selected}
+                onClick={() => onChange(opt.value)}
+                className={`am-chip ${selected ? 'selected' : ''}`}
+                style={{ padding: '12px 18px' }}
+              >
+                {opt.emoji} {opt.label}
+              </button>
+              {selected && opt.value === 1 && (
+                <Sticker
+                  kind="sparkle"
+                  size={24}
+                  style={{ position: 'absolute', top: -10, right: -6, pointerEvents: 'none' }}
+                />
+              )}
+            </div>
           );
         })}
       </div>
